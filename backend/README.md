@@ -72,9 +72,11 @@ This README is missing documentation of your endpoints. Below is an example for 
 
 Endpoints
 GET '/categories'
-GET ...
-POST ...
-DELETE ...
+GET '/questions'
+GET 'categories/<int:category_id>/questions'
+POST '/questions'
+DELETE '/questions'
+POST 'quizzes'
 
 GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
@@ -87,7 +89,39 @@ GET '/categories'
 '5' : "Entertainment",
 '6' : "Sports"}
 
+
+GET '/questions'
+- Fetches a dictionary of questions, total number of questions and categories
+- Request Arguments: page number
+- Returns: each question is a dictionary of question_id, question_text,answer, difficulty and question_category_id
+{"questions":[{"id":1,"question":"What is the capital of Egypt?","answer":"Cairo","category":3,"difficulty":1}],
+  "total_questions":1,
+  "categories":[{"id":1,"type":"Science"},{"id":2,"type":"Art"},{"id":3,"type":"Geography"},{"id":4,"type":History},{"id":5,"type":"Entertainment"},{"id":6,"type":"Sports"}]
+  }
+  
+  
+GET 'categories/<int:category_id>/questions'
+- Fetches questions per category
+- Returns : same as GET '/questions' but for a signle category
+
+POST '/questions'
+- Adds new question to Questions model
+- Request body: question, answer ,category  and difficutly
+- Returns : same response as GET '/questions' with the new added question
+
+DELETE '/questions'
+- Removes a question from the database 
+- Request Arguments: question id 
+- Returns: same as GET'/questions' but without the deleted record
+
+POST '/quizzes'
+- Fetches a single question from database
+- Request Argument: array of previous questions and desired category
+- Returns: a quesiton that is not in the prevous questions array and in the required category 
+
+
 ```
+
 
 
 ## Testing
