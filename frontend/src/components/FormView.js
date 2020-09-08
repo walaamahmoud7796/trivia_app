@@ -62,6 +62,7 @@ class FormView extends Component {
   handleChange = (event) => {
     this.setState({[event.target.name]: event.target.value})
   }
+ 
 
   render() {
     return (
@@ -90,10 +91,10 @@ class FormView extends Component {
             Category
             <select name="category" onChange={this.handleChange}>
             {Object.keys(this.state.categories).map(i => (
-				<li key={this.state.categories[i].id} onClick={() => { this.getByCategory(this.state.categories[i].id) }}>
+				<option key={this.state.categories[i].id }value= {this.state.categories[i].id} onClick={() => { this.getByCategory(this.state.categories[i].id) }}>
 					{this.state.categories[i].type}
-					<img className="category" src={this.state.categories[i].type + '.svg'}/>
-			  	</li>
+					{/* <img className="category" src={this.state.categories[i].type + '.svg'}/> */}
+			  	</option>
 			))}
             </select>
           </label>
