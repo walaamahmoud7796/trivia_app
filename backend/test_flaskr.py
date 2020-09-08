@@ -31,25 +31,63 @@ class TriviaTestCase(unittest.TestCase):
         """Executed after reach test"""
         pass
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
-    def test_search(self):
-        response = self.client().post('/questions',json={'search':'egypt'})
+ 
+
+    def test_get_categories(self):
+        response = self.client().get('/categories')
+        data = json.loads(response.data)
+        self.assertEqual(len(data['categories']),6)
+        self.assertEqual(response.status_code,200)
+
+
+    def test_get_questions(self):
+        response = self.client().get('/questions')
+        self.assertEqual(response.status_code,200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['questions']),10)
+
+
+    def test_delete_question_success(self):
+        response = self.client().get('/questions')
+        total_questions = json.loads(response.data)['total_questions']
+        response= self.client().delete(f'/questions/{total_questions-1}')
+        total_questions_after_delete = json.loads(response.data)['total_questions']
+        self.assertEqual(total_questions-1,total_questions_after_delete)
+        self.assertEqual(response.status_code,200)
+        
+
+    def test_delete_question_failed(self):
+        response= self.client().delete('/questions/50')
+        self.assertEqual(response.status_code,404)
+
+    def test_search_success(self):
+        response = self.client().post('/questions',json={'searchTerm':'egypt'})
         data = json.loads(response.data)
         self.assertEqual(response.status_code,200)
         self.assertEqual(data['success'],True)
+    
+    def test_search_failed(self):
+        response = self.client().post('/questions',json={'searchTerm':';'})
+        data = json.loads(response.data)
+        self.assertEqual(response.status_code,404)
 
-    def test_add_question(self):
-     
-        response = self.client().post('/questions',json={'question':'What is the capital of Greece','answer':'Athens','difficutly':1,'category':3})
+    def test_successful_add_question(self):
+        response = self.client().get('/questions')
+        total_questions= json.loads(response.data)['total_questions']
+        response = self.client().post('/questions',json={'question':'What is the capital of Greece','answer':'Athens','difficulty':1,'category':3})
         data = json.loads(response.data)
         self.assertEqual(response.status_code,200)
         self.assertEqual(data['success'],True)
         self.assertTrue(len(data['questions']))
+        response = self.client().get('/questions')
+        total_questions_after_add = json.loads(response.data)['total_questions']
+        self.assertEqual(total_questions_after_add,total_questions+1)
         
-
+    def test_failed_add_question(self):
+    
+        response = self.client().post('/questions',json={'question':'What is the capital of Greece'})
+        self.assertEqual(response.status_code,422)
+      
     
     def test_quiz_all_categories(self):
         questions_response = self.client().get('/questions')
@@ -60,7 +98,6 @@ class TriviaTestCase(unittest.TestCase):
             
             question_response = self.client().post('/quizzes',json={'previous_questions':previous_questions,'quiz_category':{'id':questions_data['questions'][i]['category']}})
             question_data = json.loads(question_response.data)
-            print(question_data)
             self.assertNotIn(question_data['question']['id'],previous_questions)
             previous_questions.append(questions_data['questions'][i]['id'])
 
@@ -68,13 +105,12 @@ class TriviaTestCase(unittest.TestCase):
     def test_quiz_single_category(self):
         questions_response = self.client().get('/categories/2/questions')
         questions_data = json.loads(questions_response.data)
-        # Test all categories
+        # Test single category
         previous_questions = []
         for i in range(len(questions_data)):
             
             question_response = self.client().post('/quizzes',json={'previous_questions':previous_questions,'quiz_category':{'id':questions_data['questions'][i]['category']}})
             question_data = json.loads(question_response.data)
-            print(question_data)
             self.assertNotIn(question_data['question']['id'],previous_questions)
             previous_questions.append(questions_data['questions'][i]['id'])
                 
